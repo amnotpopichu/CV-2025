@@ -26,7 +26,7 @@ def display(img, title=None):
     plt.show()
 
 # As usual, you may use your own images, but you must include them in your submission.
-image_path = '/Users/leohsia29/Documents/CV-2025/filters/image1.jpeg'
+image_path = 'filters/image1.jpeg'
 
 image = load(image_path)
 
@@ -114,6 +114,9 @@ filter3 = np.array(
 Prediction: I think that this will only change the outside edges, 
 because the -0.11*8 = -0.88 which cancels out the 1.88 in the middle.
 So i thikn it may make the outside edges darker, while keeping the rest the same
+
+Result:
+Same
 
 '''
 

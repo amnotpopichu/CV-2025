@@ -26,7 +26,7 @@ def display(img, title=None):
     plt.show()
 
 # As usual, you may use your own images, but you must include them in your submission.
-image_path = './sample_data/dog.jpg'
+image_path = 'filters/image3.jpeg'
 
 image = load(image_path)
 
