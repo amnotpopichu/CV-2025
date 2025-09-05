@@ -26,7 +26,7 @@ def display(img, title=None):
     plt.show()
 
 # As usual, you may use your own images, but you must include them in your submission.
-image_path = '/Users/leohsia29/Documents/projects/filters/image1.jpeg'
+image_path = '/Users/leohsia29/Documents/CV-2025/filters/image1.jpeg'
 
 image = load(image_path)
 
@@ -72,8 +72,18 @@ filter1 = np.array(
     [0,0,0,0,0],
     [0,0,0,0,0]
 ])
+'''
+My guess is that it may darken, because mutiplying everything by zero, 
+and then keeping 1, (my theory is that it doesn matter where the 1 is, 
+i could be wrong) will make evertyhing darker, becuase when mutiplying rgb by 0, 
+it will be closer to black
 
-#My guess is that it may darken, because mutiplying everything by zero, and then keeping 1, (my theory is that it doesn matter where the 1 is, i could be wrong) will make evertyhing darker, becuase when mutiplying rgb by 0, it will be closer to black
+
+Result: it shifted over. This does make sense, becuase the 1 is offeset from the center,
+ it effectivly moves it over. My prediction was wrong because I thought it was taking the average, 
+ of all the surrounding ones, when it wasnt.
+
+'''
 
 filter2 = np.array(
 [
@@ -83,6 +93,16 @@ filter2 = np.array(
 ])
 
 # Hint: check the lecture slides for a familiar-looking filter
+
+'''
+I think that this will NOT offset this time, becuase it is in the center. 
+I think that it will make the image brighter, becuase when mutipled by 2, it will 
+bring the RGB closer to 255, which will in turn make it closer to white
+
+Result:
+it made it brighter
+
+'''
 filter3 = np.array(
 [
     [-.11,-.11,-.11],
@@ -90,8 +110,18 @@ filter3 = np.array(
     [-.11,-.11,-.11],
 ])
 
+'''
+Prediction: I think that this will only change the outside edges, 
+because the -0.11*8 = -0.88 which cancels out the 1.88 in the middle.
+So i thikn it may make the outside edges darker, while keeping the rest the same
+
+'''
+
+
 display(image, title="Original Image")
-display(naive_convolution_filter(image, filter2), title="Filter 1")
+#display(naive_convolution_filter(image, filter1), title="Filter 1")
+#display(naive_convolution_filter(image, filter2), title="Filter 2")
+display(naive_convolution_filter(image, filter3), title="Filter 3")
 
 display(filter1, title="Filter 1")
 display(filter2, title="Filter 2")
