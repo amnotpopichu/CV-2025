@@ -62,3 +62,40 @@ def naive_convolution_filter(image, kernel):
             out[image_row, image_column] = output_value
 
     return out
+filter1 = np.array(
+[
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [0,0,0,0,1],
+    [0,0,0,0,0],
+    [0,0,0,0,0]
+])
+
+filter2 = np.array(
+[
+    [0,0,0],
+    [0,2,0],
+    [0,0,0]
+])
+
+# Hint: check the lecture slides for a familiar-looking filter
+filter3 = np.array(
+[
+    [-.11,-.11,-.11],
+    [-.11,1.88,-.11],
+    [-.11,-.11,-.11],
+])
+print(image.shape)
+channelred = image.flatten()
+channelred = channelred[:,:,2]
+channelred = channelred.reshape(image.shape[0], image.shape[1],image.shape[2])
+
+display(image)
+display(naive_convolution_filter(channelred, filter1))
+#print(channelred)
+#display(naive_convolution_filter(channelred, filter1), title="Filter 3")
+
+'''
+display(image, title="Original Image")
+display(naive_convolution_filter(image, filter1), title="Filter 1")
+'''
