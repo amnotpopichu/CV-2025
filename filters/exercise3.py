@@ -141,7 +141,7 @@ experiment3 = np.array(
     [-2, 0, 12, 0, -2],
     [0, 0, 0, 0, 0],
     [-1, 0, -2, 0, -1]
-])
+]) 
 
 #the more extreme the numbers the better it works it seems
 experiment4 = np.array(
@@ -152,5 +152,10 @@ experiment4 = np.array(
     [0, 0, 0, 0, 0],
     [-3, 0, -2, 0, -3]
 ])
+
+simpleedge = np.array(
+[
+    [1, 0, -1]
+])
 display(image, "Original Image")
-display(naive_convolution_filter(image, experiment4), "Filtered Image")
+display(naive_convolution_filter(image, simpleedge), "Filtered Image")
