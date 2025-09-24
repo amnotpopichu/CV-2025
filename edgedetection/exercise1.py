@@ -67,8 +67,9 @@ horz = cv2.filter2D(horz, -1, filter2)
 display(horz, title="Horizontal Filtered Image brighted")
 #The vertical filter picked up more "horizontal" edges, while the vertical picked up "horiziontal" edges (see markedup.png)
 
-#4
+#4 it picks up a lot of the noise
 noisy = cv2.imread('edgedetection/noisy_einstein.png')
+'''
 blur_filter = np.array([
     [1.0,2.0,1.0], 
     [2.0,4.0,2.0], 
@@ -82,3 +83,24 @@ display(noisy, title="Noisy Image")
 noisy[noisy < 100] = 0
 
 display(noisy, title="Noisy Image")
+'''
+display(noisy, title="Noisy Image")
+noisy_edit = cv2.filter2D(noisy, -1, filter)
+display(noisy_edit)
+#horiziontal edge
+#just a edge detected image, picking up a lot of the noise
+blur = np.array([
+    [1,1,1],
+    [1,1,1],
+    [1,1,1]])/9.0
+#apply blur
+noisy_edit = cv2.filter2D(noisy, -1, blur)
+display(noisy_edit)
+#show noisy blurred
+noisy_edit = cv2.filter2D(noisy_edit, -1, filter)
+#apply edge 
+noisy_edit = cv2.filter2D(noisy_edit, -1, filter2)
+#brigten
+noisy_edit[noisy_edit < 100] = 0
+#remove dark pixels
+display(noisy_edit)
