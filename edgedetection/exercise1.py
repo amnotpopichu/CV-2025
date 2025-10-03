@@ -22,7 +22,7 @@ filter = np.array(
     [1,0,-1]
 ])
 
-image = cv2.imread('edgedetection/iguana.png')
+image = cv2.imread('iguana.png')
 result = cv2.filter2D(image, -1, filter)
 display(result, title="orginal filtered image")
 
@@ -68,7 +68,7 @@ display(horz, title="Horizontal Filtered Image brighted")
 #The vertical filter picked up more "horizontal" edges, while the vertical picked up "horiziontal" edges (see markedup.png)
 
 #4 it picks up a lot of the noise
-noisy = cv2.imread('edgedetection/noisy_einstein.png')
+noisy = cv2.imread('noisy_einstein.png')
 '''
 blur_filter = np.array([
     [1.0,2.0,1.0], 
@@ -93,14 +93,40 @@ blur = np.array([
     [1,1,1],
     [1,1,1],
     [1,1,1]])/9.0
+
 #apply blur
-noisy_edit = cv2.filter2D(noisy, -1, blur)
+noisy_edit = noisy.copy()
+noisy_edit = cv2.GaussianBlur(noisy, (5, 5), 1.5)
 display(noisy_edit)
 #show noisy blurred
 noisy_edit = cv2.filter2D(noisy_edit, -1, filter)
 #apply edge 
 noisy_edit = cv2.filter2D(noisy_edit, -1, filter2)
 #brigten
-noisy_edit[noisy_edit < 100] = 0
+noisy_edit[noisy_edit < 50] = 0
 #remove dark pixels
 display(noisy_edit)
+
+
+
+#claude test -- claude made this up cuz i was wondering why iw asnt getting the results i wanted but its not working well tbh
+#it said that combining the horizontal and vertical edges would help
+
+#i fixed it
+#my number for thresholding was too high but now claude and me get similar results !
+#maybe vertical and horizitonal combined isnt super necessary
+horz_edges = cv2.filter2D(noisy_edit, -1, filter)
+
+# Vertical derivative (detects horizontal edges)
+vert_edges = cv2.filter2D(noisy_edit, -1, filter3)
+
+
+combined = np.sqrt(horz_edges.astype(float)**2 + vert_edges.astype(float)**2)
+combined = np.clip(combined, 0, 255).astype(np.uint8)
+
+display(combined, title="Combined Edges")
+
+# Brighten and threshold
+combined = cv2.filter2D(combined, -1, filter2)
+combined[combined < 50] = 0
+display(combined, title="Final Result")
