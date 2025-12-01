@@ -45,3 +45,6 @@ One of the largest issues for this project is the fact that there is clearly a l
 # Step __: Image Cropping
 We assume that ___. Our justification is that __.
 # Step __: Line Detection
+
+# Reflection
+
