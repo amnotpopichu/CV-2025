@@ -70,8 +70,28 @@ From here, I have two ways I could move forward, one using just regular opencv w
 Update again:
 I tried to fix the offset, by finding the offset ~ (120x150), and then ajusting for that, but for some reason it seems to be locked into not fixing itself. I wonder if theres some hidden barriers that I can't acess. For now I think I will proceed with keeping a live camera feed with cv2 rather than a full overlay.
 
-# Step __: Image Cropping and Processing
-We assume that ___. Our justification is that __.
+# Step 4: Image Cropping and Processing
+We assume that our area of region will be in the botton third of the screen, and the middle third. Our justification is that the screen will be set up the way that is outlined at the beginning in the section "setup". We also will be mainly concenered with what is directly in front of us, given the fact that the line detection struggles with lines that are far away and unclear.
+
+~~~ python
+def resize(frame):
+    height, width = frame.shape[0], frame.shape[1]
+    #crop (its in y,x not x,y)
+    frame = frame[2*height//3 : height, width//3 : 2*width//3]
+    return frame
+~~~
+
+From this, we can take the current frame, get its dimensions, which are the frist two values of frame.shape()
+
+Because OpenCV frames are mearly just numpy arrays, we can use numpy splicing to cut off parts of the array. Height and width are in their respective positions due to the way that OpenCV handles it. 
+
+~~~ python 
+frame = frame[2*height//3 : height, width//3 : 2*width//3]
+~~~
+
+Lets break it down:
+We are first concerned with the y side of things, so by splicing the array to only contain everything from the bottom 2/3 to the very bottom, we effectivly only keep the bottom third. The same is with the x, where we take only the center third by cutting out the rest. 
+
 # Step __: Line Detection
 
 # Reflection
