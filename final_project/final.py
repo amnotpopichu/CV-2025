@@ -24,30 +24,36 @@ def fps(frame):
     cv2.putText(frame, fps_text, (10, 30), font, 1, (0, 0, 0), 2, cv2.LINE_AA)
     return frame
 
-def img_process(frame):
+
+def blur(frame):
     frame = cv2.GaussianBlur(frame, (7, 7), 3)
+    return frame
+
+def black_white(frame):
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     threshold_value = 100
     frame[frame < threshold_value] = 0
     frame[frame > threshold_value] = 255
     return frame
 
+
+
 def line_detection(frame):
     #Below is basic line detection with overlay, taken from stack overflow linked below
     #https://stackoverflow.com/questions/52816097/line-detection-with-opencv-python-and-hough-transform
     edges = cv2.Canny(frame, 50, 150, apertureSize=3)
-    lines = cv2.HoughLinesP(edges, 1, np.pi/180, 100, minLineLength=50, maxLineGap=10)
+    lines = cv2.HoughLinesP(edges, 1, np.pi/180, 100, minLineLength=10, maxLineGap=200)
     if lines is not None:
         for line in lines:
-            #print(line)
+            
             x1, y1, x2, y2 = line[0]
             cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-    #print(lines)
+    
     return frame, lines
 def resize(frame):
     height, width = frame.shape[0], frame.shape[1]
     #crop (its in y,x not x,y)
-    frame = frame[2*height//3 : height, width//3 : 2*width//3]
+    frame = frame[height//2 : 7*height//8, width//3 : 2*width//3]
     return frame
 
 #read frames
@@ -70,9 +76,10 @@ def main():
                 break
             
             frame = fps(frame)
-            black_white = img_process(frame)
-            lines_black_white, lines = line_detection(black_white)[0], line_detection(black_white)[1]
-            print(lines)
+            blur_frame = blur(frame)
+            black_white_frame = black_white(blur_frame)
+            lines_on_black_white, lines_bw = line_detection(black_white_frame)[0], line_detection(black_white_frame)[1]
+            
             '''
             debugging stuff below
             not really debugging i guess its js a thing now
@@ -80,18 +87,25 @@ def main():
             you really dont need to see what black and white looks like with the lines, you only need the lins
             from here i can develop this into getting individual lines and figuring out how to steer the car
             '''
-            frame1 = frame.copy()
-            frame1[frame1<=255] = 0
-            lines1 = line_detection(frame)[1]
-            if lines is not None:
-                for line in lines1:
-                    #print(line)
+
+            #lines_bw is lines based on the black and white image  lines_black_white 
+            only_lines = lines_on_black_white.copy()
+            only_lines[only_lines<=255] = 0
+            #set it all to black
+
+            #lines_bw = line_detection(l)[1]
+            if lines_bw is not None:
+                for line in lines_bw:
+                    print(line)
                     x1, y1, x2, y2 = line[0]
-                    cv2.line(frame1, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    cv2.line(only_lines, (x1, y1), (x2, y2), (255, 255, 255), 2)
             
-            cv2.imshow("b w lines", frame1)
-            cv2.imshow('color', frame)
-            cv2.imshow('b&w', black_white)
+            
+            cv2.imshow('blur', blur_frame)
+            cv2.imshow("only lines", only_lines)
+            cv2.imshow('lines on black and white', lines_on_black_white)
+            
+            
             # Exit if 'q' is pressed
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
