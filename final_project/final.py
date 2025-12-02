@@ -24,18 +24,29 @@ def fps(frame):
     cv2.putText(frame, fps_text, (10, 30), font, 1, (0, 0, 0), 2, cv2.LINE_AA)
     return frame
 
+def img_process(frame):
+    frame = cv2.GaussianBlur(frame, (7, 7), 3)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    threshold_value = 150
+    frame[frame < threshold_value] = 0
+    frame[frame > threshold_value] = 255
+    return frame
+
 def line_detection(frame):
     #Below is basic line detection with overlay, taken from stack overflow linked below
     #https://stackoverflow.com/questions/52816097/line-detection-with-opencv-python-and-hough-transform
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    edges = cv2.Canny(gray, 50, 150, apertureSize=3)
+    edges = cv2.Canny(frame, 50, 150, apertureSize=3)
     lines = cv2.HoughLinesP(edges, 1, np.pi/180, 100, minLineLength=50, maxLineGap=10)
     if lines is not None:
         for line in lines:
             x1, y1, x2, y2 = line[0]
             cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
     return frame
-
+def resize(frame):
+    height, width = frame.shape[0], frame.shape[1]
+    #crop (its in y,x not x,y)
+    frame = frame[2*height//3 : height, width//3 : 2*width//3]
+    return frame
 
 #read frames
 def main():
@@ -48,18 +59,20 @@ def main():
             frame = sct_img
             #convert to numpy array bc thats how opencv interprets images
             frame = np.array(frame)
+            frame = resize(frame)
             
             #if the frame doesnt exist, then exit
             if frame is None:
                 print("Can't read frame")
                 break
             
-            #process frame with line detection
-            frame = line_detection(frame)
-            #fps counter
             frame = fps(frame)
-            #show frame
-            cv2.imshow('lines in theory', frame)
+            black_white = img_process(frame)
+            lines_black_white = line_detection(black_white)
+            cv2.imshow("test", line_detection(frame))
+            cv2.imshow('color', frame)
+            cv2.imshow('b&w', black_white)
+            cv2.imshow('black and white with lines', lines_black_white)
             # Exit if 'q' is pressed
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break

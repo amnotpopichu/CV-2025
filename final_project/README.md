@@ -1,3 +1,7 @@
+# Setup
+Open slowroads.io, and put it in the bottom half of the screen (it doesn't really matter). Run the program, and place it in the top as pictured below
+>![](images/setup.png "")
+
 # Project Overview
 
 One of my biggest hobbies is racing, especially f1, along with racing and driving games. My orginal idea for this project was to create a basic "self driving car" in a game called Assetto Corsa on a server called NoHesi (which is a server that mods the cars and driving to drive on a highway with traffic bots, where the goal is to drive as fast as possible without crashing), but for this project, and so that I could work on this project at school, I have chosen an online io game called slowroads.io 
@@ -65,7 +69,8 @@ From here, I have two ways I could move forward, one using just regular opencv w
 
 Update again:
 I tried to fix the offset, by finding the offset ~ (120x150), and then ajusting for that, but for some reason it seems to be locked into not fixing itself. I wonder if theres some hidden barriers that I can't acess. For now I think I will proceed with keeping a live camera feed with cv2 rather than a full overlay.
-# Step __: Image Cropping
+
+# Step __: Image Cropping and Processing
 We assume that ___. Our justification is that __.
 # Step __: Line Detection
 

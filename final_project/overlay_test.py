@@ -28,7 +28,6 @@ root.wm_attributes("-topmost", 1)
 
 
 def make_clickthrough():
-    root.update()
     #quite honestly I don't understand this well, but from my understanding it is macos specific
     #this is because it utilizes PyObjC and AppKit which seem to be macos specific
     #pretty much, for every window, or process in this application, which is the tk window, it should ignore all mouse clicks, making it just an overlay
