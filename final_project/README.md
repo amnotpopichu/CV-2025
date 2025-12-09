@@ -92,6 +92,10 @@ frame = frame[2*height//3 : height, width//3 : 2*width//3]
 Lets break it down:
 We are first concerned with the y side of things, so by splicing the array to only contain everything from the bottom 2/3 to the very bottom, we effectivly only keep the bottom third. The same is with the x, where we take only the center third by cutting out the rest. 
 
+
+With respect ot image processing, the code is simple. We start by converting the image to a grayscale image, from there convert it to black and white, given the argument threshold. From this, if it is below this threshold, it will turn the pixel white, and if greater, will turn it black. From this, we can now run line detection on it.
+
+
 # Step __: Line Detection
 
 # Reflection

@@ -80,9 +80,6 @@ def connected(frame, blur, bw):
         area = values[i, cv2.CC_STAT_AREA] 
         
         if (area > 140) and (area < 400):
-            # Create a new image for bounding boxes
-            new_img=frame.copy()
-            
             # Now extract the coordinate points
             x1 = values[i, cv2.CC_STAT_LEFT]
             y1 = values[i, cv2.CC_STAT_TOP]
