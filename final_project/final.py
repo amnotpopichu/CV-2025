@@ -31,7 +31,7 @@ def blur(frame):
 
 def black_white(frame):
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    threshold_value = 100
+    threshold_value = 175
     frame[frame < threshold_value] = 0
     frame[frame > threshold_value] = 255
     return frame
@@ -42,14 +42,12 @@ def line_detection(frame):
     #Below is basic line detection with overlay, taken from stack overflow linked below
     #https://stackoverflow.com/questions/52816097/line-detection-with-opencv-python-and-hough-transform
     edges = cv2.Canny(frame, 50, 150, apertureSize=3)
-    sensitivity = 10
-    lines = cv2.HoughLinesP(frame, 1, np.pi/180, sensitivity, minLineLength=10, maxLineGap=200)
-
-    
+    sensitivity = 200
+    lines = cv2.HoughLinesP(frame, 1, np.pi/180, sensitivity, minLineLength=100, maxLineGap=300)
     if lines is not None:
         for line in lines:
             x1, y1, x2, y2 = line[0]
-            cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.line(frame, (x1, y1), (x2, y2), (255, 255, 255), 2)
 
     return frame, lines, edges
 
@@ -129,15 +127,16 @@ def main():
 
             blur_frame = blur(frame)
             black_white_frame = black_white(blur_frame)
-            connection_bounding = connected(frame, blur_frame, black_white_frame)
+            #connection_bounding = connected(frame, blur_frame, black_white_frame)
             fps_frame = fps(frame)
             cv2.imshow("blur", blur_frame)
             cv2.imshow("bw", black_white_frame)
-            cv2.imshow("please speed", connection_bounding)
+            cv2.imshow("lines", line_detection(black_white_frame)[0])
+            #cv2.imshow("please speed", connection_bounding)
             
 
             #lines_on_black_white, lines_bw, edges = line_detection(black_white_frame)[0], line_detection(black_white_frame)[1], line_detection(black_white_frame)[2]
-            #cv2.imshow('edges', edges)
+            #cv2.imshow('edges', lines_on_black_white)
             
             '''
             debugging stuff below
