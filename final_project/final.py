@@ -42,8 +42,8 @@ def line_detection(frame):
     #Below is basic line detection with overlay, taken from stack overflow linked below
     #https://stackoverflow.com/questions/52816097/line-detection-with-opencv-python-and-hough-transform
     edges = cv2.Canny(frame, 50, 150, apertureSize=3)
-    sensitivity = 200
-    lines = cv2.HoughLinesP(frame, 1, np.pi/180, sensitivity, minLineLength=100, maxLineGap=300)
+    sensitivity = 50
+    lines = cv2.HoughLinesP(frame, 1, np.pi/180, sensitivity, minLineLength=100, maxLineGap=150)
     if lines is not None:
         for line in lines:
             x1, y1, x2, y2 = line[0]
@@ -132,40 +132,21 @@ def main():
             cv2.imshow("blur", blur_frame)
             cv2.imshow("bw", black_white_frame)
             cv2.imshow("lines", line_detection(black_white_frame)[0])
-            #cv2.imshow("please speed", connection_bounding)
-            
-
-            #lines_on_black_white, lines_bw, edges = line_detection(black_white_frame)[0], line_detection(black_white_frame)[1], line_detection(black_white_frame)[2]
-            #cv2.imshow('edges', lines_on_black_white)
-            
-            '''
-            debugging stuff below
-            not really debugging i guess its js a thing now
-            well its just lines, aka lines just draw on screen, nothing else
-            you really dont need to see what black and white looks like with the lines, you only need the lins
-            from here i can develop this into getting individual lines and figuring out how to steer the car
-            '''
-
-            '''
-            #lines_bw is lines based on the black and white image  lines_black_white 
-            only_lines = lines_on_black_white.copy()
+            only_lines = frame.copy()
             only_lines[only_lines<=255] = 0
-            #set it all to black
 
-            #lines_bw = line_detection(l)[1]
+            #online lines
+            #set it all to black
+            lines_bw = line_detection(black_white_frame)[1]
             if lines_bw is not None:
                 for line in lines_bw:
-                    print(line)
                     x1, y1, x2, y2 = line[0]
                     cv2.line(only_lines, (x1, y1), (x2, y2), (255, 255, 255), 2)
             
+            cv2.imshow("only lines", only_lines)
             
-            cv2.imshow('blur', blur_frame)
-            #cv2.imshow("only lines", only_lines)
-            cv2.imshow('black and white', black_white_frame)
-            cv2.imshow('lines on black and white', lines_on_black_white)
-      `      '''
-            
+
+            #cleanup
             # Exit if 'q' is pressed
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
