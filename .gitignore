@@ -2,4 +2,6 @@ final_project/projectnotes.md
 final_project/testing.py
 final_project/other.py
 final_project/moretest.py
+final_project/__pycache__/
 .DS_Store
+final_project/TODO

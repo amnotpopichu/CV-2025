@@ -4,16 +4,28 @@ Open slowroads.io, and put it in the bottom half of the screen (it doesn't reall
 
 # Project Overview
 
-One of my biggest hobbies is racing, especially f1, along with racing and driving games. My orginal idea for this project was to create a basic "self driving car" in a game called Assetto Corsa on a server called NoHesi (which is a server that mods the cars and driving to drive on a highway with traffic bots, where the goal is to drive as fast as possible without crashing), but for this project, and so that I could work on this project at school, I have chosen an online io game called slowroads.io 
+I really enjoy watching racing, especially Formula 1, along with racing and driving games. My orginal idea for this project was to create a basic "self driving car" in a game called Assetto Corsa on a server called NoHesi (which is a server that mods the cars and driving to drive on a highway with traffic bots, where the goal is to drive as fast as possible without crashing), but for this project, and so that I could work on this project at school, I have chosen an online io game called slowroads.io 
 
 The premise of the game is simple, its a "zen driving game" where there is no racing, but nonetheless is a fun relaxing endless driving game, with most importantly, road lines and a centerline. 
 
 The idea is that I will be able to crop the image displayed on screen, and then from there, detect road lines and keep it driving, hopefully without crashing.
 
+I was super inspired by the Waymos that drive around my home, and line following robots that I have seen on my social media feeds, pushing me to learn a little more about how the technology may work.
+
 # Goals before starting
 1. improve readability in code by using more functions, and better organization along with comments
 2. create something I feel somewhat connected to, something that I can feel proud of but also something that pushes me while being something that I am interested in.
 3. have fun and learn
+
+
+# TLDR:
+The way this project works is simple
+- get screen capture (with mms)
+- get a way to display data and overlay (with cv2)
+- image process and detect roadlines (cv2 and grayscale thresholds)
+#  TODO TODO TODO TODO TODO TODO TODO TODO 
+- drive and control the car using the data gathered
+
 
 # Step 1: Planning
  - warp the image to only see whats infront, and crop the image to make it so that you can only see the roadlines and whats under to reduce the amount of junk on screen and speed up detection
@@ -28,7 +40,7 @@ For this, I chose to use mss, and to do fps testing, I used this helpful tutoria
 >![FPS counter and basic overview](images/fpstests.png "Doing a great job detecting everything except road lines, fps is dropping to a little less due to the complexity of the grass")
 We can see the fps counter if you look closely at the top left, although it is very much covered by the fact that it is showing screen in screen, which is likely a significant contributor to the lower FPS in this image.
 
-The code snippet is pretty simple, it uses mss, a cross platform python package to get a screenshot of the screen, and in practice is just an efficent method of grabbing the livestream frame by frame, in a way that opencv can handle. 
+The code snippet is pretty simple, it uses mss, a cross platform python package to get a screenshot of the screen, and in practice is just an efficent method of grabbing the livestream frame by frame, in a way that OpenCV can handle. 
 
 ~~~python
 ...
@@ -43,7 +55,7 @@ with mss.mss() as sct:
 ~~~
 
 # Step 3: Overlay 
-One of the largest issues for this project is the fact that there is clearly a large opencv window displaying the debugging in the top left of our screen, so to solve this, it would be helpful to create a transparent window overlay above the desktop, that is clickthrough and see through. 
+One of the largest issues for this project is the fact that there is clearly a large OpenCV window displaying the debugging in the top left of our screen, so to solve this, it would be helpful to create a transparent window overlay above the desktop, that is clickthrough and see through. 
 
 Im really struggling with the overlay, the majority of my overlay code is in overlay_test.py, and is an adapted version of some code i found on [Stack Overflow](https://stackoverflow.com/questions/43666230/tkinter-create-canvas-that-overlays-screen-with-transparent-background), which was then adapted by Claude for MacOS use after I discovered that different platforms require different things. From there I attempted to understand what was going on, which can be seen in my comments.
 
@@ -64,7 +76,7 @@ Update:
 I realized that rather than returning every item in the list, I could just return the whole list, allowing me to draw on screen. Another thing that I have realized is #1 how sensitive the line detection is, but also how the lines seem to be offset when compared to the first image, which is apparent in the fact that the lines that would be covering my sidebar seem to be offset downwards and to the right.
 
 
-From here, I have two ways I could move forward, one using just regular opencv window in the top, and cropping the image (which I would do either way), and rather than having an invisible overlay, it would be a "live camera feed", or do signficantly more work, and make debugging slightly harder and go for a full overlay.
+From here, I have two ways I could move forward, one using just regular OpenCV window in the top, and cropping the image (which I would do either way), and rather than having an invisible overlay, it would be a "live camera feed", or do signficantly more work, and make debugging slightly harder and go for a full overlay.
 
 
 Update again:
@@ -96,7 +108,12 @@ We are first concerned with the y side of things, so by splicing the array to on
 With respect ot image processing, the code is simple. We start by converting the image to a grayscale image, from there convert it to black and white, given the argument threshold. From this, if it is below this threshold, it will turn the pixel white, and if greater, will turn it black. From this, we can now run line detection on it.
 
 
-# Step __: Line Detection
+# Line Detection:
+> One really odd thing that I have been encountering is the fact that line detection isn't working well. It is very likely that because the lines are more rectangular, and likely aren't going to get picked up (which I have noticed after a lot of testing while altering different arguments such as threshold and maxmium distance between lines), I have chosen to attempt to use _cv2.connectedComponentsWithStats_ to attempt to try from there.
 
+
+
+# Setbacks 
+# Ethical Implications
 # Reflection
 
