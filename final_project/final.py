@@ -2,12 +2,53 @@ import cv2
 import numpy as np
 import mss
 import time
+from pynput.keyboard import Key, Listener, KeyCode
+from pynput.mouse import Controller
+
+
 
 def setup():
+    print("When asked to calibrate, move your mouse to the desired position (top left or bottom right)and press 'r' to record it. Do not press any keys before prompted, and do not include the car in the calibration area.")
     #set up fps counter, pretty much justs define variables
-    global new_frame_time, prev_frame_time
+    global new_frame_time, prev_frame_time, pressed_keys, running, listener
     new_frame_time = 0
     prev_frame_time = 0
+    pressed_keys = set()
+    running = True
+    listener = Listener(on_press=on_press, on_release=on_release)
+    listener.start()
+    #0 for top left, 1 for bottom right
+    top_left = calibrate(0)
+    bottom_right = calibrate(1)
+    return top_left, bottom_right
+
+
+def on_press(key):
+    global pressed_keys
+    pressed_keys.add(key)
+
+def on_release(key):
+    global running
+    pressed_keys.discard(key)
+    if key == Key.esc:
+        running = False
+        return False
+    
+
+def calibrate(num):
+    global pressed_keys
+    if num == 0:
+        print("Awaiting top left corner... Press 'o' to record position:")
+    elif num == 1:
+        print("Awaiting bottom right corner... Press 'o' to record position:")
+    while True:
+        if KeyCode.from_char('o') in pressed_keys:
+            mouse = Controller()
+            #print(mouse.position)
+            time.sleep(0.5)
+            return mouse.position
+        
+
 
 def fps(frame):
     global new_frame_time, prev_frame_time
@@ -51,13 +92,15 @@ def line_detection(frame):
 
     return frame, lines, edges
 
+#unused function and for some reason was causing issues so fully commented out rather than let alone
+'''
 
 def resize(frame):
     height, width = frame.shape[0], frame.shape[1]
     #crop (its in y,x not x,y)
     frame = frame[height//2 : 7*height//8, width//3 : 2*width//3]
     return frame
-
+'''
 def connected(frame, blur, bw):
     threshold = cv2.threshold(bw, 0, 255,
     cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1] 
@@ -105,19 +148,25 @@ def connected(frame, blur, bw):
             output = cv2.bitwise_or(output, componentMask)
     return new_img
 
+def drive():
+    pass
+
 #read frames
-def main():
+def main(top_left, bottom_right):
     #assume using main monitor
     with mss.mss() as sct:
-        monitor = sct.monitors[1]
-        while True:
+        print(top_left,bottom_right)
+        monitor = {"top": top_left[1], "left": top_left[0], "width": bottom_right[0] - top_left[0], "height": bottom_right[1] - top_left[1]}
+        print(monitor)
+        while running:
             #get sct.grab as a frame
             sct_img = sct.grab(monitor)
             frame = sct_img
             #convert to numpy array bc thats how opencv interprets images
             frame = np.array(frame)
+            cv2.imshow("frame", frame)
             #resize
-            frame = resize(frame)
+            #frame = resize(frame)
             
             #if the frame doesnt exist, then exit
             if frame is None:
@@ -134,17 +183,22 @@ def main():
             cv2.imshow("lines", line_detection(black_white_frame)[0])
             only_lines = frame.copy()
             only_lines[only_lines<=255] = 0
-
+    
             #online lines
             #set it all to black
+            '''
             lines_bw = line_detection(black_white_frame)[1]
             if lines_bw is not None:
                 for line in lines_bw:
-                    x1, y1, x2, y2 = line[0]
-                    cv2.line(only_lines, (x1, y1), (x2, y2), (255, 255, 255), 2)
+                    if (y2-y1)/(x2-x1) <= 0.75:
+                        pass
+                    else:
+                        x1, y1, x2, y2 = line[0]
+                        print(line)
+                        cv2.line(only_lines, (x1, y1), (x2, y2), (255, 255, 255), 2)
             
             cv2.imshow("only lines", only_lines)
-            
+            '''
 
             #cleanup
             # Exit if 'q' is pressed
@@ -152,8 +206,9 @@ def main():
                 break
         #cleanup
         cv2.destroyAllWindows()
+        listener.stop()
 
 
 if __name__ == "__main__":
-    setup()
-    main()
+    top_left, bottom_right = setup()
+    main(top_left, bottom_right)
