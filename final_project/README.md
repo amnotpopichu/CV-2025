@@ -2,6 +2,10 @@
 Open slowroads.io, and put it in the bottom half of the screen (it doesn't really matter). Run the program, and place it in the top as pictured below
 >![](images/setup.png "")
 
+
+https://github.com/user-attachments/assets/820dccae-2d3c-4cb8-b34a-f1a8c9f2bb55
+
+
 # Project Overview
 
 I really enjoy watching racing, especially Formula 1, along with racing and driving games. My orginal idea for this project was to create a basic "self driving car" in a game called Assetto Corsa on a server called NoHesi (which is a server that mods the cars and driving to drive on a highway with traffic bots, where the goal is to drive as fast as possible without crashing), but for this project, and so that I could work on this project at school, I have chosen an online io game called slowroads.io 
