@@ -3,12 +3,13 @@ import numpy as np
 import mss
 import time
 from pynput.keyboard import Key, Listener, KeyCode
-from pynput.mouse import Controller
-
-
+from pynput.keyboard import Key, Listener, KeyCode, Controller as KeyboardController
+from pynput.mouse import Controller as MouseController
 
 def setup():
-    print("When asked to calibrate, move your mouse to the desired position (top left or bottom right)and press 'r' to record it. Do not press any keys before prompted, and do not include the car in the calibration area.")
+    global driving
+    driving = False
+    print("When asked to calibrate, move your mouse to the desired position (top left or bottom right) and press 'o' to record it. Do not press any keys before prompted, and do not include the car in the calibration area. Press 'q' to quit anytime.")
     #set up fps counter, pretty much justs define variables
     global new_frame_time, prev_frame_time, pressed_keys, running, listener
     new_frame_time = 0
@@ -20,7 +21,9 @@ def setup():
     #0 for top left, 1 for bottom right
     top_left = calibrate(0)
     bottom_right = calibrate(1)
-    return top_left, bottom_right
+    car_top_left = calibrate(2)
+    car_bottom_right = calibrate(3)
+    return top_left, bottom_right, car_top_left, car_bottom_right
 
 
 def on_press(key):
@@ -30,23 +33,26 @@ def on_press(key):
 def on_release(key):
     global running
     pressed_keys.discard(key)
-    if key == Key.esc:
-        running = False
-        return False
     
-
 def calibrate(num):
     global pressed_keys
     if num == 0:
         print("Awaiting top left corner... Press 'o' to record position:")
     elif num == 1:
         print("Awaiting bottom right corner... Press 'o' to record position:")
+    if num == 2:
+        print("Awaiting car top left corner... Press 'o' to record position:")
+    elif num == 3:
+        print("Awaiting car bottom right corner... Press 'o' to record position:")
     while True:
         if KeyCode.from_char('o') in pressed_keys:
-            mouse = Controller()
-            #print(mouse.position)
+            mouse = MouseController()
+            pos = mouse.position
             time.sleep(0.5)
-            return mouse.position
+            #print(mouse.position)
+            return pos
+            
+        
         
 
 
@@ -72,7 +78,7 @@ def blur(frame):
 
 def black_white(frame):
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    threshold_value = 175
+    threshold_value = 140
     frame[frame < threshold_value] = 0
     frame[frame > threshold_value] = 255
     return frame
@@ -92,7 +98,166 @@ def line_detection(frame):
 
     return frame, lines, edges
 
-#unused function and for some reason was causing issues so fully commented out rather than let alone
+def frame_only_lines(frame, black_white_frame):
+    only_lines = frame.copy()
+    only_lines[only_lines<=255] = 0
+    lines_bw = line_detection(black_white_frame)[1]
+    slopes = []
+    slope_ave=0
+    line_x_list = []
+    linex = -1
+    if lines_bw is not None:
+        for line in lines_bw:
+            x1, y1, x2, y2 = line[0]
+            if x2-x1 == 0:
+                continue
+            slope = (y2-y1)/(x2-x1)
+            if abs(slope) <= 0.75: #remove horizontal lines
+                pass
+            else:
+                slopes.append(slope)
+                line_x_list.append((x1+x2)//2)
+                cv2.line(only_lines, (x1, y1), (x2, y2), (255, 255, 255), 2)
+        if slopes:
+            for slope in slopes:
+                slope_ave += slope
+
+            linex = sum(line_x_list) // len(line_x_list)
+            slope_ave = slope_ave/len(slopes)
+        else:
+            slope_ave = 0
+    return only_lines, slope_ave, linex
+
+def drive(slope_ave, linex, car_center_x, car_center_y):
+    global driving
+    delay = 0.15
+    if KeyCode.from_char('i') in pressed_keys:
+        driving = not driving
+        time.sleep(0.5)
+    keyboard = KeyboardController()
+    
+    
+    if driving:
+        x_offset = linex - car_center_x
+        threshold = 30
+        if linex == -1:
+            keyboard.press('w')
+            time.sleep(delay/1.7)
+            keyboard.release('w')
+            return 0, -1
+        keyboard.press('w')
+        time.sleep(delay/1.3)
+        keyboard.release('w')
+        #if x offset > 0, then turn right
+        
+        if x_offset > threshold:
+            keyboard.press('d')
+            time.sleep(delay)
+            keyboard.release('d')
+            return 1, 0
+        elif x_offset < -threshold:
+            keyboard.press('a')
+            time.sleep(delay)
+            keyboard.release('a')
+            return -1, 0
+        else:    
+            if slope_ave == 0:
+                return 0, -1
+            elif slope_ave < 0:
+                keyboard.press('d')
+                time.sleep(delay)
+                keyboard.release('d')
+                return 1, 1
+            elif slope_ave > 0:
+                keyboard.press('a')
+                time.sleep(delay)
+                keyboard.release('a')
+                return -1, 1
+    else:
+        return 0, -1
+
+#read frames
+def main(top_left, bottom_right, car_top_left, car_bottom_right):
+    global driving
+    prev_slope_ave = 0
+    #assume using main monitor
+    with mss.mss() as sct:
+        print(top_left,bottom_right)
+        monitor = {"top": top_left[1], "left": top_left[0], "width": bottom_right[0] - top_left[0], "height": bottom_right[1] - top_left[1]}
+        print(monitor)
+        while running:
+            #get sct.grab as a frame
+            sct_img = sct.grab(monitor)
+            frame = sct_img
+            #convert to numpy array bc thats how opencv interprets images
+            frame = np.array(frame)
+            #resize
+            #frame = resize(frame)
+            
+            #if the frame doesnt exist, then exit
+            if frame is None:
+                print("Can't read frame")
+                break
+            car_y1 = int(car_top_left[1] - top_left[1])
+            car_y2 = int(car_bottom_right[1] - top_left[1])
+            car_x1 = int(car_top_left[0] - top_left[0])
+            car_x2 = int(car_bottom_right[0] - top_left[0])
+            car_center_x = (car_x1 + car_x2) // 2
+            car_center_y = (car_y1 + car_y2) // 2
+
+            frame[car_y1:car_y2, car_x1:car_x2] = 0
+            
+    
+            blur_frame = blur(frame)
+            black_white_frame = black_white(blur_frame)
+            only_lines, slope_ave, linex = frame_only_lines(frame, black_white_frame)
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            cv2.putText(only_lines, str(round(slope_ave, 2)), (10, 30), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            x_offset = linex - car_center_x
+            cv2.putText(only_lines, str(round(x_offset, 3)), (10, 70), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(only_lines, str(driving), (130, 30), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            if slope_ave != 0:
+                drive_slope = slope_ave
+                prev_slope_ave = slope_ave
+            else:
+                drive_slope = prev_slope_ave
+            direction, cause = drive(drive_slope, linex, car_center_x, car_center_y)
+            
+            if linex == -1:
+                cv2.putText(only_lines, "no lines", (100, 70), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            elif direction == 1 and cause == 0:
+                cv2.putText(only_lines, "turning right cause: baseline", (100, 70), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            elif direction == -1 and cause == 0:
+                cv2.putText(only_lines, "turning left cause: baseline", (100, 70), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            elif direction == 1 and cause == 1:
+                cv2.putText(only_lines, "turning right cause: direction", (100, 70), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            elif direction == -1 and cause == 1:
+                cv2.putText(only_lines, "turning left cause: direction", (100, 70), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            else:
+                cv2.putText(only_lines, "yay it worked", (100, 70), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            
+            fps_frame = fps(frame)
+            cv2.imshow("blur", blur_frame)
+            cv2.imshow("lines", line_detection(black_white_frame)[0])
+            cv2.imshow("only lines", only_lines)
+            #cleanup
+            # Exit if 'q' is pressed
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        #cleanup
+        cv2.destroyAllWindows()
+        listener.stop()
+
+
+if __name__ == "__main__":
+    top_left, bottom_right, car_top_left, car_bottom_right = setup()
+    main(top_left, bottom_right, car_top_left, car_bottom_right)
+
+
+
+
+
+#Below are either testing functions, or ones that were used and then removed later
 '''
 
 def resize(frame):
@@ -100,7 +265,7 @@ def resize(frame):
     #crop (its in y,x not x,y)
     frame = frame[height//2 : 7*height//8, width//3 : 2*width//3]
     return frame
-'''
+
 def connected(frame, blur, bw):
     threshold = cv2.threshold(bw, 0, 255,
     cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1] 
@@ -147,68 +312,5 @@ def connected(frame, blur, bw):
             component = cv2.bitwise_or(component,componentMask)
             output = cv2.bitwise_or(output, componentMask)
     return new_img
+'''
 
-def drive():
-    pass
-
-#read frames
-def main(top_left, bottom_right):
-    #assume using main monitor
-    with mss.mss() as sct:
-        print(top_left,bottom_right)
-        monitor = {"top": top_left[1], "left": top_left[0], "width": bottom_right[0] - top_left[0], "height": bottom_right[1] - top_left[1]}
-        print(monitor)
-        while running:
-            #get sct.grab as a frame
-            sct_img = sct.grab(monitor)
-            frame = sct_img
-            #convert to numpy array bc thats how opencv interprets images
-            frame = np.array(frame)
-            cv2.imshow("frame", frame)
-            #resize
-            #frame = resize(frame)
-            
-            #if the frame doesnt exist, then exit
-            if frame is None:
-                print("Can't read frame")
-                break
-            
-
-            blur_frame = blur(frame)
-            black_white_frame = black_white(blur_frame)
-            #connection_bounding = connected(frame, blur_frame, black_white_frame)
-            fps_frame = fps(frame)
-            cv2.imshow("blur", blur_frame)
-            cv2.imshow("bw", black_white_frame)
-            cv2.imshow("lines", line_detection(black_white_frame)[0])
-            only_lines = frame.copy()
-            only_lines[only_lines<=255] = 0
-    
-            #online lines
-            #set it all to black
-            '''
-            lines_bw = line_detection(black_white_frame)[1]
-            if lines_bw is not None:
-                for line in lines_bw:
-                    if (y2-y1)/(x2-x1) <= 0.75:
-                        pass
-                    else:
-                        x1, y1, x2, y2 = line[0]
-                        print(line)
-                        cv2.line(only_lines, (x1, y1), (x2, y2), (255, 255, 255), 2)
-            
-            cv2.imshow("only lines", only_lines)
-            '''
-
-            #cleanup
-            # Exit if 'q' is pressed
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-        #cleanup
-        cv2.destroyAllWindows()
-        listener.stop()
-
-
-if __name__ == "__main__":
-    top_left, bottom_right = setup()
-    main(top_left, bottom_right)

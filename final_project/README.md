@@ -112,6 +112,8 @@ With respect ot image processing, the code is simple. We start by converting the
 > One really odd thing that I have been encountering is the fact that line detection isn't working well. It is very likely that because the lines are more rectangular, and likely aren't going to get picked up (which I have noticed after a lot of testing while altering different arguments such as threshold and maxmium distance between lines), I have chosen to attempt to use _cv2.connectedComponentsWithStats_ to attempt to try from there.
 
 
+IT WORKED SOMEWHAT
+>![video](images/test1.mov)
 
 # Setbacks 
 # Ethical Implications
