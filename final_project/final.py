@@ -73,14 +73,21 @@ def fps(frame):
 
 
 def blur(frame):
-    frame = cv2.GaussianBlur(frame, (7, 7), 3)
+    blur_intensity = 9
+    frame = cv2.GaussianBlur(frame, (blur_intensity, blur_intensity ), 3)
     return frame
 
 def black_white(frame):
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    threshold_value = 140
-    frame[frame < threshold_value] = 0
-    frame[frame > threshold_value] = 255
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    # threshold_value = 140
+    # frame[frame < threshold_value] = 0
+    # frame[frame > threshold_value] = 255
+    s_thresh = 35 # above is discarded (too colorful)
+    v_thresh = 127 # above is white
+    frame = (frame[:,:,1] < s_thresh) & (frame[:,:,2] > v_thresh)
+
+    frame = frame.astype(np.uint8) * 255
     return frame
 
 
