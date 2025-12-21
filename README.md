@@ -1,2 +1,2 @@
-Github Repo CS280 -- computer vision work @ The Nueva School
+Github Repo for CS280 -- computer vision work @ The Nueva School
 
