@@ -3,18 +3,19 @@
 2. Make sure you are in the project repo, and from there enter the subdirectory called final_project with `cd CV-2025/final_project/`
 3. Install packages from requirements.txt: `pip install -r requirements.txt`(optionally with a virtual enviorment)
 4. Open [slowroads.io](slowroads.io), and from there press begin, and wait for the car to load in.
-5. Enter settings (on slowroads) with escape, and scroll until you find the "hide UI" button. Select that.
+5. Enter settings (on slowroads) with escape, and scroll until you find the "hide UI" button. Select that. While in settings, also go to controls and scroll until you find "toggle cinecam
 6. After exiting settings, press and hold on the car, and drag the mouse downwards to achive a birds eye view of the car. 
-7. Run final.py
+7. Run final.py, and press o in the top left corner, top right, and the car, (as shown in video) to calibrate
 8. Drag the games window below the windows that have been created by final.py
 9. Zoom in and zoom out (as you would on a pdf) in the game, until lines are registered like the video below.
+10. Press i to begin.
 
 
 https://github.com/user-attachments/assets/482aa366-9ec4-41f9-9874-0db5203e32c3
 
 
 # Results
-The program works well, as demonstrated below, 
+I am pretty happy with the result, at first I thought I wasn't ambitious enough with my work, but as I worked through the project, I faced many issues and I finished with something that I can be proud of. While there are always ways to make it better, I think that it was good work, and a project that I can be happy with. More notes and limitations are noted below.
 https://github.com/user-attachments/assets/1102b156-5b93-4042-ae10-10e0ea684133
 # Process
 
@@ -133,5 +134,10 @@ With respect to image processing, the code is simple. We start by converting the
 
 ## Setbacks 
 ## Limitations
+I have a few known issues, and solutions to them (if I had a lot more time).
+1. Overcorrection
+2. Forever acceleration
+3. Incorrect or lacking detection
+4. Lack of threading
 ## Reflection
-
+Overall, I was pretty happy with this project, and was a great way to end off a semester. Whlie it can always be improved, I am proud to say that it was one of the best projects I have done so far, and has taught me so much about long term project management, and learning how to publish, with learning inline git, to writing my first readme, I am super proud of myself, and the amount of hours put in.
