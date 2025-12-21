@@ -7,13 +7,15 @@
 6. After exiting settings, press and hold on the car, and drag the mouse downwards to achive a birds eye view of the car. 
 7. Run final.py
 8. Drag the games window below the windows that have been created by final.py
-9. Zoom in and zoom out (as you would on a pdf) in the game, until lines are registered like the image below.
+9. Zoom in and zoom out (as you would on a pdf) in the game, until lines are registered like the video below.
 
 
 https://github.com/user-attachments/assets/482aa366-9ec4-41f9-9874-0db5203e32c3
 
 
 # Results
+The program works well, as demonstrated below, 
+https://github.com/user-attachments/assets/1102b156-5b93-4042-ae10-10e0ea684133
 # Process
 
 ## Project Overview
@@ -120,16 +122,13 @@ Lets break it down:
 We are first concerned with the y side of things, so by splicing the array to only contain everything from the bottom 2/3 to the very bottom, we effectivly only keep the bottom third. The same is with the x, where we take only the center third by cutting out the rest. 
 
 
-With respect ot image processing, the code is simple. We start by converting the image to a grayscale image, from there convert it to black and white, given the argument threshold. From this, if it is below this threshold, it will turn the pixel white, and if greater, will turn it black. From this, we can now run line detection on it.
+With respect to image processing, the code is simple. We start by converting the image to a grayscale image, from there convert it to black and white, given the argument threshold. From this, if it is below this threshold, it will turn the pixel white, and if greater, will turn it black. From this, we can now run line detection on it.
 
 
 ## Line Detection:
 > One really odd thing that I have been encountering is the fact that line detection isn't working well. It is very likely that because the lines are more rectangular, and likely aren't going to get picked up (which I have noticed after a lot of testing while altering different arguments such as threshold and maximum distance between lines), I have chosen to attempt to use `cv2.connectedComponentsWithStats` to attempt to try from there.
 
 
-# Results
-
-https://github.com/user-attachments/assets/1102b156-5b93-4042-ae10-10e0ea684133
 
 
 ## Setbacks 

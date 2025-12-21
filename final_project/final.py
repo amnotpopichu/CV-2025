@@ -5,6 +5,19 @@ import time
 from pynput.keyboard import Key, Listener, KeyCode, Controller as KeyboardController
 from pynput.mouse import Controller as MouseController
 
+
+'''
+Args:
+func black_white()
+    s_thresh: saturation threshold
+    v_thresh: value threshold
+func drive()
+    threshold: driving threshold for offset on baseline
+    delay: delay between key presses (higher = slower, lower = faster)
+func line_detection()
+    sensitivity: hough line sensitivity 
+
+'''
 def setup():
     global driving
     driving = False
@@ -136,7 +149,7 @@ def frame_only_lines(frame, black_white_frame):
 
 def drive(slope_ave, linex, car_center_x, car_center_y):
     global driving
-    delay = 0.15
+    delay = 0.3
     if KeyCode.from_char('i') in pressed_keys:
         driving = not driving
         time.sleep(0.5)
@@ -258,65 +271,4 @@ def main(top_left, bottom_right, car_top_left, car_bottom_right):
 if __name__ == "__main__":
     top_left, bottom_right, car_top_left, car_bottom_right = setup()
     main(top_left, bottom_right, car_top_left, car_bottom_right)
-
-
-
-
-
-#Below are either testing functions, or ones that were used and then removed later
-'''
-
-def resize(frame):
-    height, width = frame.shape[0], frame.shape[1]
-    #crop (its in y,x not x,y)
-    frame = frame[height//2 : 7*height//8, width//3 : 2*width//3]
-    return frame
-
-def connected(frame, blur, bw):
-    threshold = cv2.threshold(bw, 0, 255,
-    cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1] 
-    analysis = cv2.connectedComponentsWithStats(threshold, 
-                                            4, 
-                                                cv2.CV_32S)
-    (totalLabels, label_ids, values, centroid) = analysis
-
-    # Initialize a new image to
-    # store all the output components
-    output = np.zeros(bw.shape, dtype="uint8")
-    new_img = frame.copy()
-
-    # Loop through each component
-    for i in range(1, totalLabels):
-    
-        # Area of the component
-        area = values[i, cv2.CC_STAT_AREA] 
-        
-        if (area > 140) and (area < 400):
-            # Now extract the coordinate points
-            x1 = values[i, cv2.CC_STAT_LEFT]
-            y1 = values[i, cv2.CC_STAT_TOP]
-            w = values[i, cv2.CC_STAT_WIDTH]
-            h = values[i, cv2.CC_STAT_HEIGHT]
-            
-            # Coordinate of the bounding box
-            pt1 = (x1, y1)
-            pt2 = (x1+ w, y1+ h)
-            (X, Y) = centroid[i]
-            
-            # Bounding boxes for each component
-            cv2.rectangle(new_img,pt1,pt2,
-                        (0, 255, 0), 3)
-            cv2.circle(new_img, (int(X),
-                                int(Y)), 
-                    4, (0, 0, 255), -1)
-
-            # Create a new array to show individual component
-            component = np.zeros(frame.shape, dtype="uint8")
-            componentMask = (label_ids == i).astype("uint8") * 255
-
-            # Apply the mask using the bitwise operator
-            component = cv2.bitwise_or(component,componentMask)
-            output = cv2.bitwise_or(output, componentMask)
-    return new_img
-'''
 
