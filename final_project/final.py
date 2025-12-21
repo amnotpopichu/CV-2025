@@ -64,10 +64,6 @@ def calibrate(num):
             #print(mouse.position)
             return pos
             
-        
-        
-
-
 def fps(frame):
     global new_frame_time, prev_frame_time
     #calculate fps by taking new time, then subtracting previous time, and doing 1/ all of that to get the fps
@@ -154,9 +150,7 @@ def drive(slope_ave, linex, car_center_x, car_center_y):
         driving = not driving
         time.sleep(0.5)
     keyboard = KeyboardController()
-    
-    
-    if driving:
+    if driving == True:
         x_offset = linex - car_center_x
         threshold = 30
         if linex == -1:

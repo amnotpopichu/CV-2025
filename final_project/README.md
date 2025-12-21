@@ -18,7 +18,6 @@ https://github.com/user-attachments/assets/482aa366-9ec4-41f9-9874-0db5203e32c3
 I am pretty happy with the result, at first I thought I wasn't ambitious enough with my work, but as I worked through the project, I faced many issues and I finished with something that I can be proud of. While there are always ways to make it better, I think that it was good work, and a project that I can be happy with. More notes and limitations are noted below.
 https://github.com/user-attachments/assets/1102b156-5b93-4042-ae10-10e0ea684133
 # Process
-
 ## Project Overview
 
 I really enjoy watching racing, especially Formula 1, along with racing and driving games. My orginal idea for this project was to create a basic "self driving car" in a game called Assetto Corsa on a server called NoHesi (which is a server that mods the cars and driving to drive on a highway with traffic bots, where the goal is to drive as fast as possible without crashing), but for this project, and so that I could work on this project at school, I have chosen an online io game called slowroads.io 
@@ -61,15 +60,21 @@ The code snippet is pretty simple, it uses mss, a cross platform python package 
 
 ~~~python
 ...
-
 with mss.mss() as sct:
-        monitor = sct.monitors[1]
-        while True:
+        print(top_left,bottom_right)
+        monitor = {"top": top_left[1], "left": top_left[0], "width": bottom_right[0] - top_left[0], "height": bottom_right[1] - top_left[1]}
+        print(monitor)
+        while running:
             sct_img = sct.grab(monitor)
             frame = sct_img
             frame = np.array(frame)
-            ...
+            if frame is None:
+                print("Can't read frame")
+                break
+
 ~~~
+
+The `with mss.mss() as sct` acts as a 
 
 ## Overlay 
 One of the largest issues for this project is the fact that there is clearly a large OpenCV window displaying the debugging in the top left of our screen, so to solve this, it would be helpful to create a transparent window overlay above the desktop, that is clickthrough and see through. 
@@ -139,5 +144,7 @@ I have a few known issues, and solutions to them (if I had a lot more time).
 2. Forever acceleration
 3. Incorrect or lacking detection
 4. Lack of threading
+
+Adressing overcorrection, I learned that I could use PID 
 ## Reflection
 Overall, I was pretty happy with this project, and was a great way to end off a semester. Whlie it can always be improved, I am proud to say that it was one of the best projects I have done so far, and has taught me so much about long term project management, and learning how to publish, with learning inline git, to writing my first readme, I am super proud of myself, and the amount of hours put in.
