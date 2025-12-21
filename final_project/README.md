@@ -5,15 +5,12 @@
 4. Open [slowroads.io](slowroads.io), and from there press begin, and wait for the car to load in.
 5. Enter settings (on slowroads) with escape, and scroll until you find the "hide UI" button. Select that.
 6. After exiting settings, press and hold on the car, and drag the mouse downwards to achive a birds eye view of the car. 
+7. Run final.py
+8. Drag the games window below the windows that have been created by final.py
+9. Zoom in and zoom out (as you would on a pdf) in the game, until lines are registered like the image below.
+
 # Results
 # Process
-## Setup
-Open slowroads.io, and put it in the bottom half of the screen (it doesn't really matter). Run the program, and place it in the top as pictured below
->![](images/setup.png "")
-
-
-https://github.com/user-attachments/assets/820dccae-2d3c-4cb8-b34a-f1a8c9f2bb55
-
 
 ## Project Overview
 
