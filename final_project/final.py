@@ -16,7 +16,8 @@ func drive()
     delay: delay between key presses (higher = slower, lower = faster)
 func line_detection()
     sensitivity: hough line sensitivity 
-
+func main()
+    debug: show debug windows with various stages of processing
 '''
 def setup():
     global driving
@@ -52,7 +53,7 @@ def calibrate(num):
         print("Awaiting top left corner... Press 'o' to record position:")
     elif num == 1:
         print("Awaiting bottom right corner... Press 'o' to record position:")
-    if num == 2:
+    elif num == 2:
         print("Awaiting car top left corner... Press 'o' to record position:")
     elif num == 3:
         print("Awaiting car bottom right corner... Press 'o' to record position:")
@@ -103,7 +104,7 @@ def black_white(frame):
 def line_detection(frame):
     #Below is basic line detection with overlay, taken from stack overflow linked below
     #https://stackoverflow.com/questions/52816097/line-detection-with-opencv-python-and-hough-transform
-    edges = cv2.Canny(frame, 50, 150, apertureSize=3)
+    #edges = cv2.Canny(frame, 50, 150, apertureSize=3)
     sensitivity = 50
     lines = cv2.HoughLinesP(frame, 1, np.pi/180, sensitivity, minLineLength=100, maxLineGap=150)
     if lines is not None:
@@ -111,7 +112,8 @@ def line_detection(frame):
             x1, y1, x2, y2 = line[0]
             cv2.line(frame, (x1, y1), (x2, y2), (255, 255, 255), 2)
 
-    return frame, lines, edges
+    #return frame, lines, edges
+    return frame, lines
 
 def frame_only_lines(frame, black_white_frame):
     only_lines = frame.copy()
@@ -192,6 +194,7 @@ def drive(slope_ave, linex, car_center_x, car_center_y):
 #read frames
 def main(top_left, bottom_right, car_top_left, car_bottom_right):
     global driving
+    debug = True
     prev_slope_ave = 0
     #assume using main monitor
     with mss.mss() as sct:
@@ -249,10 +252,11 @@ def main(top_left, bottom_right, car_top_left, car_bottom_right):
             else:
                 cv2.putText(only_lines, "yay it worked", (100, 70), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
             
-            fps_frame = fps(frame)
-            cv2.imshow("blur", blur_frame)
-            cv2.imshow("lines", line_detection(black_white_frame)[0])
-            cv2.imshow("only lines", only_lines)
+            #fps_frame = fps(frame)
+            if debug == True:
+                cv2.imshow("blur", blur_frame)
+                cv2.imshow("lines", line_detection(black_white_frame)[0])
+                cv2.imshow("only lines", only_lines)
             #cleanup
             # Exit if 'q' is pressed
             if cv2.waitKey(1) & 0xFF == ord('q'):
