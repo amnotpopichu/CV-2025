@@ -119,8 +119,6 @@ The current issue with the overlay that I am running into is that the code is cu
 >![](images/overlaytest.png)
 
 
-
-
 >TLDR: It only displays one line rather than all of them because my code isn't built for this
 
 
