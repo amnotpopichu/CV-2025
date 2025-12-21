@@ -1,12 +1,12 @@
 # How to Run
 1. Clone the repository with `git clone https://github.com/amnotpopichu/CV-2025`
 2. Make sure you are in the project repo, and from there enter the subdirectory called final_project with `cd CV-2025/final_project/`
-3. Install packages from requirements.txt: `pip install -r requirements.txt`(optionally with a virtual environment)
-4. Open [slowroads.io](slowroads.io), and from there press begin, and wait for the car to load in.
+3. Install packages from requirements.txt: `pip install -r requirements.txt` (optionally with a virtual environment)
+4. Open [slowroads.io](https://slowroads.io), and from there press begin, and wait for the car to load in.
 5. Enter settings (on slowroads) with escape, and scroll until you find the "hide UI" button. Select that. While in settings, also go to controls and scroll until you find "toggle cinecam".
-6. After exiting settings, press and hold on the car, and drag the mouse downwards to achieve a birds eye view of the car.
+6. After exiting settings, press and hold on the car, and drag the mouse downwards to achieve a bird's eye view of the car.
 7. Run final.py, and press o in the top left corner, bottom right, and the car corners (as shown in video) to calibrate
-8. Drag the games window below the windows that have been created by final.py
+8. Drag the game's window below the windows that have been created by final.py
 9. Zoom in and zoom out (as you would on a pdf) in the game, until lines are registered like the video below.
 10. Press i to begin.
 
@@ -47,7 +47,7 @@ I was super inspired by the Waymos that drive around my home, and line following
 
 ## TLDR:
 The way this project works is simple
-- get screen capture (with mms)
+- get screen capture (with mss)
 - get a way to display data and overlay (with cv2)
 - image process and detect roadlines (cv2 and HSV thresholds)
 - drive and control the car using the data gathered
@@ -172,14 +172,14 @@ frame = frame[2*height//3 : height, width//3 : 2*width//3]
 ~~~
 
 
-Lets break it down:
+Let's break it down:
 We are first concerned with the y side of things, so by splicing the array to only contain everything from the bottom 2/3 to the very bottom, we effectively only keep the bottom third. The same is with the x, where we take only the center third by cutting out the rest.
 
 
 With respect to image processing, the code is simple. We start by converting the image to a grayscale image, from there convert it to black and white, given the argument threshold. From this, if it is below this threshold, it will turn the pixel white, and if greater, will turn it black. From this, we can now run line detection on it.
 </s>
 
-Because we already calibrate where the image would be, it allows us to cut most of this completely. From here we merely need to convert the image to black and white, which is done through HSV analysis, and cutting past a certain threshold. HSV is used because it gives us a very effective way of finding if it is too colorful (meaning we can disregard it), and if it is close to a bright (white) value. If not, we can remove it. This makes great black and white image, where the white must be very white to work.
+Because we already calibrate where the image would be, it allows us to cut most of this completely. From here we merely need to convert the image to black and white, which is done through HSV analysis, and cutting past a certain threshold. HSV is used because it gives us a very effective way of finding if it is too colorful (meaning we can disregard it), and if it is close to a bright (white) value. If not, we can remove it. This makes a great black and white image, where the white must be very white to work.
 ~~~ python
 s_thresh = 35 # above is discarded (too colorful)
     v_thresh = 127 # above is white
@@ -190,7 +190,7 @@ s_thresh = 35 # above is discarded (too colorful)
 ~~~
 
 ## Line Detection
-For this, I used `cv2.HoughLinesP` to get the lines, where the code is mainly derived from [this](https://stackoverflow.com/questions/52816097/line-detection-with-opencv-python-and-hough-transform) stack overflow post, and adapted to fit my needs. The code is mainly simple, and just gets the lines, and returns the information. Along with this, it draws the lines on the screen.
+For this, I used `cv2.HoughLinesP` to get the lines, where the code is mainly derived from [this](https://stackoverflow.com/questions/52816097/line-detection-with-opencv-python-and-hough-transform) Stack Overflow post, and adapted to fit my needs. The code is mainly simple, and just gets the lines, and returns the information. Along with this, it draws the lines on the screen.
 
 
 ~~~python
@@ -236,7 +236,7 @@ This code does a few things:
 3. returns it all for the next driving function
 
 ## Driving
-The driving function relies on the package `pynput`, and allows me to get and send inputs. The code simply checks if the program is "running", or if the user has set the code to run, which is triggered by the `i` key. If it does, then it will check if the car is too far from the "baseline", which is calculated by the car's position (grabbed from calibration in setup), along with using the x position of the car and average x position of the line. If it is too far, the car will steer towards the "centerline". With the slope calculated from the previous code block, it also lets me steer towards the line, if it needs to make a turn. 
+The driving function relies on the package `pynput`, and allows me to get and send inputs. The code simply checks if the program is "running", or if the user has set the code to run, which is triggered by the `i` key. If it does, then it will check if the car is too far from the "baseline", which is calculated by the car's position (grabbed from calibration in setup), along with using the x position of the car and average x position of the line. If it is too far, the car will steer towards the "centerline". With the slope calculated from the previous code block, it also lets me steer towards the line if it needs to make a turn. 
 
 ## TLDR
 The workflow is as follows:
@@ -249,7 +249,7 @@ The workflow is as follows:
 This code went through a lot of iterations but here are some of the biggest ones.
 1. Figuring out how to get input, this took a while to refactor some code to make it actually be able to run two while loops at once.
 2. The driving function and slope took a while to think about and figure out how to work.
-3. In the beginning, I couldn't get the lines to get detected, and had to try multiple things, before I finetuned the blur, along with the sensitivity.
+3. In the beginning, I couldn't get the lines to get detected, and had to try multiple things, before I fine-tuned the blur, along with the sensitivity.
 ## Limitations
 I have a few known issues, and solutions to them (if I had a lot more time).
 1. Overcorrection
@@ -262,6 +262,6 @@ Addressing overcorrection, I learned that I could use a PID controller, which I 
 
 Another known issue is that it forever accelerates. I considered trying to find the friction coefficient, but instead due to other issues, it likely will fail before it reaches speeds that will make the program ineffective (or run into a wall slowing its speed first).
 
-Sometimes, it also can't detect lines, which is almost impossible to fix due to the camera angles given. The only real solution here is the one I implemented, where if it can't find a line, it just drives off the previous direction. Another possible idea, is a way that it would change the thresholding of the HSV along with the Hough Lines if no lines are present. 
+Sometimes, it also can't detect lines, which is almost impossible to fix due to the camera angles given. The only real solution here is the one I implemented, where if it can't find a line, it just drives based on the previous direction. Another possible idea, is a way that it would change the thresholding of the HSV along with the Hough Lines if no lines are present. 
 ## Reflection
 Overall, I was pretty happy with this project, and it was a great way to end off a semester. While it can always be improved, I am proud to say that it was one of the best projects I have done so far, and has taught me so much about long term project management, and learning how to publish, with learning inline git, to writing my first readme, I am super proud of myself, and the amount of hours put in.
