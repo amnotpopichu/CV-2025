@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import mss
 import time
-from pynput.keyboard import Key, Listener, KeyCode
 from pynput.keyboard import Key, Listener, KeyCode, Controller as KeyboardController
 from pynput.mouse import Controller as MouseController
 

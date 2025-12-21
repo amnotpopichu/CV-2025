@@ -1,4 +1,7 @@
-# Setup
+# How to Run
+# Results
+# Process
+## Setup
 Open slowroads.io, and put it in the bottom half of the screen (it doesn't really matter). Run the program, and place it in the top as pictured below
 >![](images/setup.png "")
 
@@ -6,7 +9,7 @@ Open slowroads.io, and put it in the bottom half of the screen (it doesn't reall
 https://github.com/user-attachments/assets/820dccae-2d3c-4cb8-b34a-f1a8c9f2bb55
 
 
-# Project Overview
+## Project Overview
 
 I really enjoy watching racing, especially Formula 1, along with racing and driving games. My orginal idea for this project was to create a basic "self driving car" in a game called Assetto Corsa on a server called NoHesi (which is a server that mods the cars and driving to drive on a highway with traffic bots, where the goal is to drive as fast as possible without crashing), but for this project, and so that I could work on this project at school, I have chosen an online io game called slowroads.io 
 
@@ -16,27 +19,26 @@ The idea is that I will be able to crop the image displayed on screen, and then 
 
 I was super inspired by the Waymos that drive around my home, and line following robots that I have seen on my social media feeds, pushing me to learn a little more about how the technology may work.
 
-# Goals before starting
+## Goals before starting
 1. improve readability in code by using more functions, and better organization along with comments
 2. create something I feel somewhat connected to, something that I can feel proud of but also something that pushes me while being something that I am interested in.
 3. have fun and learn
 
 
-# TLDR:
+## TLDR:
 The way this project works is simple
 - get screen capture (with mms)
 - get a way to display data and overlay (with cv2)
-- image process and detect roadlines (cv2 and grayscale thresholds)
-#  TODO TODO TODO TODO TODO TODO TODO TODO 
+- image process and detect roadlines (cv2 and HSV thresholds)
 - drive and control the car using the data gathered
 
 
-# Step 1: Planning
+## Step 1: Planning
  - warp the image to only see whats infront, and crop the image to make it so that you can only see the roadlines and whats under to reduce the amount of junk on screen and speed up detection
  - display lines for viewer through transparent window overlay 
  - find a way to control the car based on where lines are -- how to detect turns?
 
-# Step 2: Screen capture
+## Step 2: Screen capture
 The goal for this first coding session is to start by just being able to capture the screen in a way that OpenCV can view it. Some of my options included mss, PIL, and forcing a screenshot using a hotkey, along with ffmpeg. While ffmpeg may be optimal, I will chose to us mss due to simplicity and performance.
 
 ### Result
@@ -58,7 +60,7 @@ with mss.mss() as sct:
             ...
 ~~~
 
-# Step 3: Overlay 
+## Step 3: Overlay 
 One of the largest issues for this project is the fact that there is clearly a large OpenCV window displaying the debugging in the top left of our screen, so to solve this, it would be helpful to create a transparent window overlay above the desktop, that is clickthrough and see through. 
 
 Im really struggling with the overlay, the majority of my overlay code is in overlay_test.py, and is an adapted version of some code i found on [Stack Overflow](https://stackoverflow.com/questions/43666230/tkinter-create-canvas-that-overlays-screen-with-transparent-background), which was then adapted by Claude for MacOS use after I discovered that different platforms require different things. From there I attempted to understand what was going on, which can be seen in my comments.
@@ -83,10 +85,11 @@ I realized that rather than returning every item in the list, I could just retur
 From here, I have two ways I could move forward, one using just regular OpenCV window in the top, and cropping the image (which I would do either way), and rather than having an invisible overlay, it would be a "live camera feed", or do signficantly more work, and make debugging slightly harder and go for a full overlay.
 
 
+
 Update again:
 I tried to fix the offset, by finding the offset ~ (120x150), and then ajusting for that, but for some reason it seems to be locked into not fixing itself. I wonder if theres some hidden barriers that I can't acess. For now I think I will proceed with keeping a live camera feed with cv2 rather than a full overlay.
 
-# Step 4: Image Cropping and Processing
+## Step 4: Image Cropping and Processing
 We assume that our area of region will be in the botton third of the screen, and the middle third. Our justification is that the screen will be set up the way that is outlined at the beginning in the section "setup". We also will be mainly concenered with what is directly in front of us, given the fact that the line detection struggles with lines that are far away and unclear.
 
 ~~~ python
@@ -112,8 +115,8 @@ We are first concerned with the y side of things, so by splicing the array to on
 With respect ot image processing, the code is simple. We start by converting the image to a grayscale image, from there convert it to black and white, given the argument threshold. From this, if it is below this threshold, it will turn the pixel white, and if greater, will turn it black. From this, we can now run line detection on it.
 
 
-# Line Detection:
-> One really odd thing that I have been encountering is the fact that line detection isn't working well. It is very likely that because the lines are more rectangular, and likely aren't going to get picked up (which I have noticed after a lot of testing while altering different arguments such as threshold and maximum distance between lines), I have chosen to attempt to use _cv2.connectedComponentsWithStats_ to attempt to try from there.
+## Line Detection:
+> One really odd thing that I have been encountering is the fact that line detection isn't working well. It is very likely that because the lines are more rectangular, and likely aren't going to get picked up (which I have noticed after a lot of testing while altering different arguments such as threshold and maximum distance between lines), I have chosen to attempt to use 'cv2.connectedComponentsWithStats' to attempt to try from there.
 
 
 IT WORKED SOMEWHAT
@@ -122,7 +125,7 @@ IT WORKED SOMEWHAT
 https://github.com/user-attachments/assets/1102b156-5b93-4042-ae10-10e0ea684133
 
 
-# Setbacks 
-# Ethical Implications
-# Reflection
+## Setbacks 
+## Ethical Implications
+## Reflection
 
