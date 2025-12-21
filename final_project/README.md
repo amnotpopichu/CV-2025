@@ -9,6 +9,10 @@
 8. Drag the games window below the windows that have been created by final.py
 9. Zoom in and zoom out (as you would on a pdf) in the game, until lines are registered like the image below.
 
+
+https://github.com/user-attachments/assets/482aa366-9ec4-41f9-9874-0db5203e32c3
+
+
 # Results
 # Process
 
