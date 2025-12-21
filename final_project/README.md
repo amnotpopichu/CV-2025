@@ -1,4 +1,10 @@
 # How to Run
+1. Clone the repository with `git clone https://github.com/amnotpopichu/CV-2025`
+2. Make sure you are in the project repo, and from there enter the subdirectory called final_project with `cd CV-2025/final_project/`
+3. Install packages from requirements.txt: `pip install -r requirements.txt`(optionally with a virtual enviorment)
+4. Open [slowroads.io](slowroads.io), and from there press begin, and wait for the car to load in.
+5. Enter settings (on slowroads) with escape, and scroll until you find the "hide UI" button. Select that.
+6. After exiting settings, press and hold on the car, and drag the mouse downwards to achive a birds eye view of the car. 
 # Results
 # Process
 ## Setup
@@ -116,7 +122,7 @@ With respect ot image processing, the code is simple. We start by converting the
 
 
 ## Line Detection:
-> One really odd thing that I have been encountering is the fact that line detection isn't working well. It is very likely that because the lines are more rectangular, and likely aren't going to get picked up (which I have noticed after a lot of testing while altering different arguments such as threshold and maximum distance between lines), I have chosen to attempt to use 'cv2.connectedComponentsWithStats' to attempt to try from there.
+> One really odd thing that I have been encountering is the fact that line detection isn't working well. It is very likely that because the lines are more rectangular, and likely aren't going to get picked up (which I have noticed after a lot of testing while altering different arguments such as threshold and maximum distance between lines), I have chosen to attempt to use `cv2.connectedComponentsWithStats` to attempt to try from there.
 
 
 IT WORKED SOMEWHAT
