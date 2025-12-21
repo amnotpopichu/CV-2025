@@ -40,12 +40,13 @@ The way this project works is simple
 - drive and control the car using the data gathered
 
 
-## Step 1: Planning
+## Planning
  - warp the image to only see whats infront, and crop the image to make it so that you can only see the roadlines and whats under to reduce the amount of junk on screen and speed up detection
  - display lines for viewer through transparent window overlay 
  - find a way to control the car based on where lines are -- how to detect turns?
 
-## Step 2: Screen capture
+# Code Breakdown
+## Screen capture
 The goal for this first coding session is to start by just being able to capture the screen in a way that OpenCV can view it. Some of my options included mss, PIL, and forcing a screenshot using a hotkey, along with ffmpeg. While ffmpeg may be optimal, I will chose to us mss due to simplicity and performance.
 
 ### Result
@@ -67,7 +68,7 @@ with mss.mss() as sct:
             ...
 ~~~
 
-## Step 3: Overlay 
+## Overlay 
 One of the largest issues for this project is the fact that there is clearly a large OpenCV window displaying the debugging in the top left of our screen, so to solve this, it would be helpful to create a transparent window overlay above the desktop, that is clickthrough and see through. 
 
 Im really struggling with the overlay, the majority of my overlay code is in overlay_test.py, and is an adapted version of some code i found on [Stack Overflow](https://stackoverflow.com/questions/43666230/tkinter-create-canvas-that-overlays-screen-with-transparent-background), which was then adapted by Claude for MacOS use after I discovered that different platforms require different things. From there I attempted to understand what was going on, which can be seen in my comments.
@@ -96,7 +97,7 @@ From here, I have two ways I could move forward, one using just regular OpenCV w
 Update again:
 I tried to fix the offset, by finding the offset ~ (120x150), and then ajusting for that, but for some reason it seems to be locked into not fixing itself. I wonder if theres some hidden barriers that I can't acess. For now I think I will proceed with keeping a live camera feed with cv2 rather than a full overlay.
 
-## Step 4: Image Cropping and Processing
+## Image Cropping and Processing
 We assume that our area of region will be in the botton third of the screen, and the middle third. Our justification is that the screen will be set up the way that is outlined at the beginning in the section "setup". We also will be mainly concenered with what is directly in front of us, given the fact that the line detection struggles with lines that are far away and unclear.
 
 ~~~ python
@@ -126,13 +127,12 @@ With respect ot image processing, the code is simple. We start by converting the
 > One really odd thing that I have been encountering is the fact that line detection isn't working well. It is very likely that because the lines are more rectangular, and likely aren't going to get picked up (which I have noticed after a lot of testing while altering different arguments such as threshold and maximum distance between lines), I have chosen to attempt to use `cv2.connectedComponentsWithStats` to attempt to try from there.
 
 
-IT WORKED SOMEWHAT
-
+# Results
 
 https://github.com/user-attachments/assets/1102b156-5b93-4042-ae10-10e0ea684133
 
 
 ## Setbacks 
-## Ethical Implications
+## Limitations
 ## Reflection
 
