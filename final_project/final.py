@@ -1,13 +1,13 @@
-import cv2
-import numpy as np
-import mss
-import time
-from pynput.keyboard import Key, Listener, KeyCode, Controller as KeyboardController
-from pynput.mouse import Controller as MouseController
+import cv2 #for image processing
+import numpy as np #for array manipulations
+import mss #for screen capturing
+import time #for fps calculations 
+from pynput.keyboard import Key, Listener, KeyCode, Controller as KeyboardController #for keyboard input and control
+from pynput.mouse import Controller as MouseController #for mouse input
 
 
 '''
-Args:
+Args for finetuning:
 func black_white()
     s_thresh: saturation threshold
     v_thresh: value threshold
@@ -19,26 +19,32 @@ func line_detection()
 func main()
     debug: show debug windows with various stages of processing
 '''
+
+
 def setup():
     global driving
+    global new_frame_time, prev_frame_time, pressed_keys, running, listener
+    #make sure doesnt drive instantly
     driving = False
     print("When asked to calibrate, move your mouse to the desired position (top left or bottom right) and press 'o' to record it. Do not press any keys before prompted, and do not include the car in the calibration area. Press 'q' to quit anytime.")
     #set up fps counter, pretty much justs define variables
-    global new_frame_time, prev_frame_time, pressed_keys, running, listener
+    #fps calculations
     new_frame_time = 0
     prev_frame_time = 0
     pressed_keys = set()
     running = True
+    #start listening for keys
     listener = Listener(on_press=on_press, on_release=on_release)
     listener.start()
     #0 for top left, 1 for bottom right
+    #calibrate screen area and car area
     top_left = calibrate(0)
     bottom_right = calibrate(1)
     car_top_left = calibrate(2)
     car_bottom_right = calibrate(3)
     return top_left, bottom_right, car_top_left, car_bottom_right
 
-
+#key input functions
 def on_press(key):
     global pressed_keys
     pressed_keys.add(key)
@@ -47,6 +53,8 @@ def on_release(key):
     global running
     pressed_keys.discard(key)
     
+
+#calibrating positions for mouse and screen area
 def calibrate(num):
     global pressed_keys
     if num == 0:
@@ -82,20 +90,20 @@ def fps(frame):
 
 
 def blur(frame):
+    #blur the image with cv2 to remove noise from grass
     blur_intensity = 9
     frame = cv2.GaussianBlur(frame, (blur_intensity, blur_intensity ), 3)
     return frame
 
 def black_white(frame):
+    #converts to hsv then thresholds to black and white
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
     # threshold_value = 140
     # frame[frame < threshold_value] = 0
     # frame[frame > threshold_value] = 255
     s_thresh = 35 # above is discarded (too colorful)
     v_thresh = 127 # above is white
     frame = (frame[:,:,1] < s_thresh) & (frame[:,:,2] > v_thresh)
-
     frame = frame.astype(np.uint8) * 255
     return frame
 
@@ -106,23 +114,30 @@ def line_detection(frame):
     #https://stackoverflow.com/questions/52816097/line-detection-with-opencv-python-and-hough-transform
     #edges = cv2.Canny(frame, 50, 150, apertureSize=3)
     sensitivity = 50
+    #get lines
     lines = cv2.HoughLinesP(frame, 1, np.pi/180, sensitivity, minLineLength=100, maxLineGap=150)
+    #draw lines on screen
     if lines is not None:
         for line in lines:
             x1, y1, x2, y2 = line[0]
             cv2.line(frame, (x1, y1), (x2, y2), (255, 255, 255), 2)
 
     #return frame, lines, edges
+    #return line details
     return frame, lines
 
 def frame_only_lines(frame, black_white_frame):
+    #funny function that is overly complicated to ONLY show the lines (no black and white stuff), and do line calculations 
     only_lines = frame.copy()
     only_lines[only_lines<=255] = 0
+    #make a black screen
+    #get lines
     lines_bw = line_detection(black_white_frame)[1]
     slopes = []
     slope_ave=0
     line_x_list = []
     linex = -1
+
     if lines_bw is not None:
         for line in lines_bw:
             x1, y1, x2, y2 = line[0]
@@ -134,12 +149,12 @@ def frame_only_lines(frame, black_white_frame):
             else:
                 slopes.append(slope)
                 line_x_list.append((x1+x2)//2)
-                cv2.line(only_lines, (x1, y1), (x2, y2), (255, 255, 255), 2)
+                cv2.line(only_lines, (x1, y1), (x2, y2), (255, 255, 255), 2) #calculate average slope
         if slopes:
             for slope in slopes:
                 slope_ave += slope
 
-            linex = sum(line_x_list) // len(line_x_list)
+            linex = sum(line_x_list) // len(line_x_list) #find average x position of lines
             slope_ave = slope_ave/len(slopes)
         else:
             slope_ave = 0
@@ -149,13 +164,13 @@ def drive(slope_ave, linex, car_center_x, car_center_y):
     global driving
     delay = 0.3
     if KeyCode.from_char('i') in pressed_keys:
-        driving = not driving
+        driving = not driving #toggle key for driving
         time.sleep(0.5)
     keyboard = KeyboardController()
     if driving == True:
         x_offset = linex - car_center_x
         threshold = 30
-        if linex == -1:
+        if linex == -1: #drives forward
             keyboard.press('w')
             time.sleep(delay/1.7)
             keyboard.release('w')
@@ -165,7 +180,7 @@ def drive(slope_ave, linex, car_center_x, car_center_y):
         keyboard.release('w')
         #if x offset > 0, then turn right
         
-        if x_offset > threshold:
+        if x_offset > threshold: #turn left and right
             keyboard.press('d')
             time.sleep(delay)
             keyboard.release('d')
@@ -200,9 +215,9 @@ def main(top_left, bottom_right, car_top_left, car_bottom_right):
     with mss.mss() as sct:
         print(top_left,bottom_right)
         monitor = {"top": top_left[1], "left": top_left[0], "width": bottom_right[0] - top_left[0], "height": bottom_right[1] - top_left[1]}
-        print(monitor)
+        #print(monitor) #debug
         while running:
-            #get sct.grab as a frame
+            #get sct.grab as a frame 
             sct_img = sct.grab(monitor)
             frame = sct_img
             #convert to numpy array bc thats how opencv interprets images
@@ -220,10 +235,10 @@ def main(top_left, bottom_right, car_top_left, car_bottom_right):
             car_x2 = int(car_bottom_right[0] - top_left[0])
             car_center_x = (car_x1 + car_x2) // 2
             car_center_y = (car_y1 + car_y2) // 2
-
+            #calibration math and blacking out the car area so it doesnt interfere with line detection
             frame[car_y1:car_y2, car_x1:car_x2] = 0
             
-    
+            #process frame
             blur_frame = blur(frame)
             black_white_frame = black_white(blur_frame)
             only_lines, slope_ave, linex = frame_only_lines(frame, black_white_frame)
@@ -232,6 +247,8 @@ def main(top_left, bottom_right, car_top_left, car_bottom_right):
             x_offset = linex - car_center_x
             cv2.putText(only_lines, str(round(x_offset, 3)), (10, 70), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
             cv2.putText(only_lines, str(driving), (130, 30), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+
+            #drives based on slope, if no slope is present it defaults to the one previously detected
             if slope_ave != 0:
                 drive_slope = slope_ave
                 prev_slope_ave = slope_ave
@@ -239,6 +256,8 @@ def main(top_left, bottom_right, car_top_left, car_bottom_right):
                 drive_slope = prev_slope_ave
             direction, cause = drive(drive_slope, linex, car_center_x, car_center_y)
             
+
+            #debugging and displaying
             if linex == -1:
                 cv2.putText(only_lines, "no lines", (100, 70), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
             elif direction == 1 and cause == 0:
@@ -267,6 +286,7 @@ def main(top_left, bottom_right, car_top_left, car_bottom_right):
 
 
 if __name__ == "__main__":
+    #runs the program
     top_left, bottom_right, car_top_left, car_bottom_right = setup()
     main(top_left, bottom_right, car_top_left, car_bottom_right)
 
