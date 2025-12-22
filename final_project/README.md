@@ -6,7 +6,7 @@
 5. Enter settings (on slowroads) with escape, and scroll until you find the "hide UI" button. Select that. While in settings, also go to controls and scroll until you find "toggle cinecam".
 6. After exiting settings, press and hold on the car, and drag the mouse downwards to achieve a bird's eye view of the car.
 7. Run final.py, and press o in the top left corner, bottom right, and the car corners (as shown in video) to calibrate
-8. Drag the game's window below the windows that have been created by final.py
+8. Drag the game's window below the windows that have been created by final.py (python version 3.13.7)
 9. Zoom in and zoom out (as you would on a pdf) in the game, until lines are registered like the video below.
 10. Press i to begin.
 
